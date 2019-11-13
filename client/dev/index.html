@@ -5,8 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Link Manager 2</title>
   </head>
-  <body>
-    <script src="./app/main.js"></script>
+  <body style="background-color: white;">
 
     <script>
       function restartApp() {
@@ -19,9 +18,11 @@
         console.log("restarted");
       }
     </script>
+    <button id="refresh" onclick="restartApp()">Refresh</button>
     
     <div id="app"></div>
 
-    <button id="refresh" onclick="restartApp()">Refresh</button>
+    <script src="./app/main.js"></script>
+
   </body>
 </html>

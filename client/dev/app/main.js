@@ -1,6 +1,6 @@
 import * as R from "ramda";
 
-import { app } from "hyperapp";
+import { app, h } from "hyperapp";
 
 import CSInterface from "../vendor/CSInterface"; // I had to manually add export line to vendor file :(
 
@@ -11,8 +11,10 @@ import { browserItemsFromLinks } from "./helpers/browserItemsFromLinks";
 import { asyncSubscriptionHandler } from "./helpers/asyncSubscriptionHandler";
 
 const csInterface = new CSInterface();
+
 const dispatchEventWithCSInterface = (type, data) =>
   dispatchEvent(csInterface, type, data);
+
 const createCEPEventSubscriptionWithCSInterface = type =>
   createCEPEventSubscription(csInterface, type);
 
@@ -29,7 +31,6 @@ const onBrowserItemsUpdate = createCEPEventSubscriptionWithCSInterface(
 );
 
 const __ = state => state;
-
 
 const SetLinksAndBrowserItems = (state, links) => {
   console.log("SetLinksAndBrowserItems", {
@@ -52,6 +53,12 @@ const SetDocument = (state, document) => {
   return { ...state, document };
 };
 
+const WidthSpacer = ({ depth }) => (
+  <span style={{ display: "inline-flex" }}>
+    {R.repeat(<span style={{ width: 20 }}>-</span>, depth)}
+  </span>
+);
+
 app({
   init: [
     {
@@ -59,6 +66,27 @@ app({
       links: []
     }
   ],
+
+  view: state => (
+    <main>
+      {R.map(
+        browserItem => (
+          <div>
+            <p>
+              <WidthSpacer depth={browserItem.indent} />
+              <span>{browserItem.label}</span>
+            </p>
+          </div>
+        ),
+        R.sortWith([
+          R.ascend(R.path(["sortKeys", "path"])),
+          R.ascend(R.prop("indent")),
+          R.descend(R.path(["sortKeys", "parentPage"])),
+          // R.ascend(R.path(["sortKeys", "page"])),
+        ])(state.browserItems || [])
+      )}
+    </main>
+  ),
 
   subscriptions: state => [
     onSelectionChanged(
