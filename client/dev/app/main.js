@@ -1,4 +1,4 @@
-import R from "ramda";
+import * as R from "ramda";
 
 import { app } from "hyperapp";
 
@@ -7,6 +7,8 @@ import CSInterface from "../vendor/CSInterface"; // I had to manually add export
 import { runJSX } from "./helpers/jsx";
 import { dispatchEvent } from "./helpers/dispatchEvent";
 import { createCEPEventSubscription } from "./helpers/cepEventSubscription";
+import { browserItemsFromLinks } from "./helpers/browserItemsFromLinks";
+import { asyncSubscriptionHandler } from "./helpers/asyncSubscriptionHandler";
 
 const csInterface = new CSInterface();
 const dispatchEventWithCSInterface = (type, data) =>
@@ -28,15 +30,17 @@ const onBrowserItemsUpdate = createCEPEventSubscriptionWithCSInterface(
 
 const __ = state => state;
 
-const SetLinks = (state, links) => {
-  console.log("SetLinks", {
-    ...state,
-    links
-  });
 
+const SetLinksAndBrowserItems = (state, links) => {
+  console.log("SetLinksAndBrowserItems", {
+    ...state,
+    links,
+    browserItems: browserItemsFromLinks(links)
+  });
   return {
     ...state,
-    links
+    links,
+    browserItems: browserItemsFromLinks(links)
   };
 };
 
@@ -47,8 +51,6 @@ const SetDocument = (state, document) => {
   });
   return { ...state, document };
 };
-
-const asyncSubscriptionHandler = fn => state => [state, (() => [fn])()];
 
 app({
   init: [
@@ -71,13 +73,13 @@ app({
 
           runJSX("getLinks.jsx", res =>
             dispatchEventWithCSInterface("com.linkmanager2.updatedLinks", res)
-          )
+          );
         } else {
           // changed selection within same doc
         }
       })
     ),
-    onLinksUpdate(SetLinks)
+    onLinksUpdate(SetLinksAndBrowserItems)
   ],
 
   node: document.querySelector("#app")
@@ -86,17 +88,3 @@ app({
 runJSX("getLinks.jsx", res =>
   dispatchEventWithCSInterface("com.linkmanager2.updatedLinks", res)
 );
-
-// state => {
-//   const document = await new Promise((resolve, reject) => runJSX("getActiveDoc.jsx", resolve))
-
-//   console.log(document, state.document)
-//   // if (document != state.document) {
-//   //   console.log("switched")
-//   // }
-
-//   return {
-//     ...state,
-//     document
-//   };
-// }
