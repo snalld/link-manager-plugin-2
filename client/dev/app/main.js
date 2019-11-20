@@ -7,8 +7,8 @@ import CSInterface from "../vendor/CSInterface"; // I had to manually add export
 import { runJSX } from "./helpers/jsx";
 import { dispatchEvent } from "./helpers/dispatchEvent";
 import { createCEPEventSubscription } from "./helpers/cepEventSubscription";
-import { browserItemsFromLinks } from "./helpers/browserItemsFromLinks";
 import { asyncSubscriptionHandler } from "./helpers/asyncSubscriptionHandler";
+import { browserItemsFromLinks } from "./helpers/browserItemsFromLinks";
 
 const csInterface = new CSInterface();
 
@@ -22,92 +22,97 @@ const onSelectionChanged = createCEPEventSubscriptionWithCSInterface(
   "afterSelectionChanged"
 );
 
-const onLinksUpdate = createCEPEventSubscriptionWithCSInterface(
-  "com.linkmanager2.updatedLinks"
-);
-
-const onBrowserItemsUpdate = createCEPEventSubscriptionWithCSInterface(
-  "com.linkmanager2.updatedBrowserItems"
+const onDocumentActivate = createCEPEventSubscriptionWithCSInterface(
+  "documentAfterActivate"
 );
 
 const __ = state => state;
 
-const SetLinksAndBrowserItems = (state, links) => {
-  console.log("SetLinksAndBrowserItems", {
-    ...state,
-    links,
-    browserItems: browserItemsFromLinks(links)
-  });
-  return {
-    ...state,
-    links,
-    browserItems: browserItemsFromLinks(links)
-  };
-};
+const fs = eval('require("fs")');
+import { promisify } from "util";
+const access = promisify(fs.access);
 
-const SetDocument = (state, document) => {
-  console.log("SetDocument", {
-    ...state,
-    document
-  });
-  return { ...state, document };
-};
+import { BrowserItem } from "./components/BrowserItem";
 
-const WidthSpacer = ({ depth }) => (
-  <span style={{ display: "inline-flex" }}>
-    {R.repeat(<span style={{ width: 20 }}>-</span>, depth)}
-  </span>
-);
+import { SetLinksAndBrowserItems } from "./actions/SetLinksAndBrowserItems";
+import { SetActiveDocument } from "./actions/SetActiveDocument";
+import { JSX } from "./effects/JSX";
 
-app({
+const getByID = (id, links) => R.find(R.propEq("id", id), links);
+
+const main = app({
   init: [
     {
-      document: "",
+      hostEventListeners: {},
+      activeDocument: "",
       links: []
-    }
+    },
+    JSX({
+      action: SetLinksAndBrowserItems,
+      filename: "getLinks.jsx"
+    })
   ],
 
   view: state => (
     <main>
-      {R.map(
-        browserItem => (
-          <div>
-            <p>
-              <WidthSpacer depth={browserItem.indent} />
-              <span>{browserItem.label}</span>
-            </p>
-          </div>
-        ),
-        R.sortWith([
-          R.ascend(R.path(["sortKeys", "path"])),
-          R.ascend(R.prop("indent")),
-          R.descend(R.path(["sortKeys", "parentPage"])),
-          // R.ascend(R.path(["sortKeys", "page"])),
-        ])(state.browserItems || [])
-      )}
+      {console.log(state)}
+
+      {R.addIndex(R.map)(browserItem => {
+        let exists = true;
+        if (browserItem.type !== "file") {
+          try {
+            fs.accessSync("/Volumes/" + browserItem.path, fs.constants.F_OK);
+          } catch (error) {
+            exists = false;
+          }
+        } else {
+        }
+
+        return <BrowserItem item={browserItem} error={!exists}></BrowserItem>;
+      }, R.sortWith([R.ascend(R.prop("key"))])(state.browserItems || []))}
     </main>
   ),
 
   subscriptions: state => [
-    onSelectionChanged(
-      asyncSubscriptionHandler(async dispatch => {
-        const document = await new Promise((resolve, reject) =>
-          runJSX("getActiveDoc.jsx", resolve)
-        );
+    // onSelectionChanged(
+    //   asyncSubscriptionHandler(async dispatch => {
+    //     console.log("change selection");
+    //   const document = await new Promise((resolve, reject) =>
+    //     runJSX("getActiveDoc.jsx", resolve)
+    //   );
+    //   console.log(document)
 
-        if (state.document !== document) {
-          // changed document
-          dispatch(SetDocument, document);
+    //   if (state.document !== document) {
+    //     // changed document
+    //     dispatch(SetActiveDocument, document);
 
-          runJSX("getLinks.jsx", res =>
-            dispatchEventWithCSInterface("com.linkmanager2.updatedLinks", res)
-          );
-        } else {
-          // changed selection within same doc
-        }
+    //     runJSX("getLinks.jsx", res =>
+    //       dispatchEventWithCSInterface("com.linkmanager2.updatedLinks", res)
+    //     );
+    //   } else {
+    //     // changed selection within same doc
+    //   }
+    //   })
+    // ),
+
+    onDocumentActivate((state, data) => {
+      const regexURL = /<url>(file:)(.+)<\/url>/;
+      const urlRaw = (regexURL.exec(data) || [])[2];
+      const url = decodeURI(urlRaw || "");
+
+      const regexName = /<name>(.+)<\/name>/;
+      const name = regexName.exec(data)[1];
+
+      return SetActiveDocument(state, `${url}:${name}`);
+    }),
+
+    onDocumentActivate([
+      state,
+      JSX({
+        action: SetLinksAndBrowserItems,
+        filename: "getLinks.jsx"
       })
-    ),
-    onLinksUpdate(SetLinksAndBrowserItems)
+    ])
   ],
 
   node: document.querySelector("#app")

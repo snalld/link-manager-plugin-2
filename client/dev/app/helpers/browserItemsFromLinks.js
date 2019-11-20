@@ -17,35 +17,47 @@ const generateLinkKeyParts = R.compose(
 export const browserItemsFromLinks = links => {
   const browserItems = new Map();
   R.reduce(
-    (acc, link) => {
+    (items, link) => {
       const keyParts = generateLinkKeyParts(link);
+
       R.addIndex(R.reduce)(([prevPart, prevKey], part, idx) => {
         if (!part) part = 0;
+
         const key = `${prevKey || ""}/${part}`;
-        if (acc.has(key)) return [part, key];
+        
+        let ids = []
+        if (items.has(key)) {
+          ids = items.get(key).ids
+        }
+
         let browserItem = {
-          // key,
+          key,
+          ids: [...ids, link.id],
           indent: idx,
           label: `/${part}`
         };
-        let filepathParts = /(.+\.[a-zA-Z]{3,4})(\/[a-zA-Z0-9]{5}-\d{5}-\d{5})?/.exec(
+
+        const r = /(.+\.[a-zA-Z]{2,4})(\/[a-zA-Z0-9]{5}-\d{5}-\d{5})?/
+        const filepathParts = r.exec(
           key
         );
+
         if (!filepathParts) {
           browserItem = {
             ...browserItem,
             type: "directory",
+            path: key,
             sortKeys: {
-              path: key
             }
           };
         } else {
           const path = filepathParts[1];
+
           if (!filepathParts[2]) {
             browserItem = {
               ...browserItem,
+              path,
               sortKeys: {
-                path
               },
               type: "group"
             };
@@ -53,8 +65,8 @@ export const browserItemsFromLinks = links => {
             browserItem = {
               ...browserItem,
               label: `/${prevPart}`,
+              path,
               sortKeys: {
-                path,
                 parentPage: filepathParts[2].slice(1, 6),
                 page: Number(filepathParts[2].slice(7, 12)),
                 id: Number(filepathParts[2].slice(13))
@@ -63,16 +75,17 @@ export const browserItemsFromLinks = links => {
             };
           }
         }
-        acc.set(key, browserItem);
+
+        items.set(key, browserItem);
+
         return [part, key];
       }, "")(keyParts);
-      return acc;
+
+      return items;
     },
     browserItems,
     links
   );
-  const v = [...browserItems.values()];
-  return v;
-  // console.log(R.sortWith([R.ascend(R.prop('path')), R.ascend(R.prop('id'))])(v))
-  return browserItems;
+
+  return [...browserItems.values()];
 };

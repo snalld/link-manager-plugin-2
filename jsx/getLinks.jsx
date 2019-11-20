@@ -8,11 +8,14 @@ function getLinks() {
   for (var i = 0; i < links.length; i++) {
     var srcLink = links[i];
     var parent = srcLink.parent;
+    
+    // alert(parent.parent.parent.constructor)
+    
     var link = {
       path: srcLink.filePath,
       name: srcLink.name,
       id: srcLink.id,
-      parentPage: (parent.parentPage || parent.parent.parent.pages[0]).name,
+      parentPage: (parent.parentPage || parent.parent.parent.pages[0]).name, // breaks on anchored objects!!! `parent.parent.parent.constructor` is `Character` instead of expected `Spread`
       source: srcLink.toSource(),
       status: (function(status) {
         if (status === LinkStatus.LINK_MISSING) return "MISSING";

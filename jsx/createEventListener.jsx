@@ -1,22 +1,27 @@
 ﻿//@include "vendor/json2.js"
 
-function createEventListener(type, name) {
-  var eventListeners = app.activeDocument.eventListeners;
-
-  try {
-    eventListeners.remove(type);
-  } catch (error) {}
-
-  var eventListener = eventListeners.add(type, function(event) {
+function createHandler(name) {
+  return function handler() {
     if (new ExternalObject("lib:PlugPlugExternalObject")) {
       var eventObj = new CSXSEvent();
       eventObj.type = name;
       eventObj.scope = "APPLICATION"
       eventObj.dispatch();
     }
-  });
+  }
+}
 
-  return "" + eventListener.id;
+function createEventListener(type, name) {
+  var eventListeners = app.activeDocument.eventListeners;
+
+  var eventListener = eventListeners.add(type, createHandler(name));
+
+  return { 
+    data: {
+      listener: eventListener.toSource(),
+      document: doc.toSource()
+    }
+  }
 }
 
 var main = createEventListener;

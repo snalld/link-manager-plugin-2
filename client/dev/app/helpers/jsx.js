@@ -28,7 +28,7 @@ const readJSX = async (filepathRelative, root) => {
     : resolveJSXInclude(root, filepathRelative);
 
   const script = await readFile(filepathAbsolute, "utf8");
-  
+
   const includeStrings = script.match(/\/\/@include +\"(.+)\"/g) || [];
   const includePaths = includeStrings.map(
     includeString => includeString.match(/"(.+)"/)[1]
@@ -54,7 +54,7 @@ const flattenIncludes = ({ path, script, includes }) => {
 
 export const runJSX = async (
   filepathRelative,
-  callback = () => {},
+  callback = data => data,
   args = []
 ) => {
   var jsonScript = await readJSX("./vendor/json2.js");
@@ -122,10 +122,10 @@ ${createScript(script)};
   try {
     window.__adobe_cep__.evalScript(wrappedScript, res => {
       try {
-        const data = JSON.parse(res).data
+        const data = JSON.parse(res).data;
         callback(data);
       } catch (error) {
-        console.error(error);
+        console.error(res);
       }
     });
   } catch (err) {
