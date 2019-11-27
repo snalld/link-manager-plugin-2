@@ -30,27 +30,29 @@ const access = promisify(fs.access);
 
 import { BrowserItem } from "./components/BrowserItem";
 
+import { InitPanelData } from "./actions/InitPanelData";
 import { SetSelectedLinkIDs } from "./actions/SetSelectedLinkIDs";
 import { SetActiveDocument } from "./actions/SetActiveDocument";
-import { JSX } from "./effects/JSX";
+import { JSX } from "./effects/jsx";
 
 const getByID = (id, links) => R.find(R.propEq("id", id), links);
-
-
-import { InitPanelData } from "./actions/InitPanelData";
 
 app({
   init: [
     {
       hostEventListeners: {},
-      activeDocument: "",
+      activeDocument: {},
       links: [],
       selectedLinkIDs: []
     },
     JSX({
       action: InitPanelData,
       filename: "getLinks.jsx"
-    })
+    }),
+    JSX({
+      action: SetActiveDocument,
+      filename: "getActiveDocument.jsx"
+    }),
   ],
 
   view: state => (
@@ -59,16 +61,7 @@ app({
 
       {R.addIndex(R.map)(browserItem => {
         let exists = true;
-        if (browserItem.type !== "file") {
-          try {
-            fs.accessSync("/Volumes/" + browserItem.path, fs.constants.F_OK);
-          } catch (error) {
-            exists = false;
-          }
-        } else {
-        }
-
-        return <BrowserItem item={browserItem} error={!exists}></BrowserItem>;
+        return <BrowserItem item={browserItem} error={!browserItem.error}></BrowserItem>;
       }, R.sortWith([R.ascend(R.prop("key"))])(R.values(state.browserItems) || []))}
     </main>
   ),

@@ -1,10 +1,18 @@
 export const SetActiveDocument = (state, activeDocument) => {
-  // const regexURL = /<url>(file:)(.+)<\/url>/;
-  // const urlRaw = (regexURL.exec(data) || [])[2];
-  // const url = decodeURI(urlRaw || "");
 
-  // const regexName = /<name>(.+)<\/name>/;
-  // const name = regexName.exec(data)[1];
+  if (typeof activeDocument === "string") {
+    const regexURL = /<url>(file:)(.+)<\/url>/;
+    const urlRaw = (regexURL.exec(activeDocument) || [])[2];
+    const path = decodeURI(urlRaw || "");
+
+    const regexName = /<name>(.+)<\/name>/;
+    const name = regexName.exec(activeDocument)[1];
+
+    activeDocument = {
+      name,
+      path
+    };
+  }
 
   return {
     ...state,

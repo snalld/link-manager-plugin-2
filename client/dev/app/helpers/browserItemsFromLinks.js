@@ -24,31 +24,29 @@ export const browserItemsFromLinks = links => {
         if (!part) part = 0;
 
         const key = `${prevKey || ""}/${part}`;
-        
-        let ids = []
+
+        let ids = [];
         if (items.has(key)) {
-          ids = items.get(key).ids
+          ids = items.get(key).ids;
         }
 
         let browserItem = {
           key,
           ids: [...ids, link.id],
           indent: idx,
-          label: `/${part}`
+          label: `/${part}`,
+          error: false
         };
 
-        const r = /(.+\.[a-zA-Z]{2,4})(\/[a-zA-Z0-9]{5}-\d{5}-\d{5})?/
-        const filepathParts = r.exec(
-          key
-        );
+        const r = /(.+\.[a-zA-Z]{2,4})(\/[a-zA-Z0-9]{5}-\d{5}-\d{5})?/;
+        const filepathParts = r.exec(key);
 
         if (!filepathParts) {
           browserItem = {
             ...browserItem,
             type: "directory",
             path: key,
-            sortKeys: {
-            }
+            sortKeys: {}
           };
         } else {
           const path = filepathParts[1];
@@ -57,8 +55,7 @@ export const browserItemsFromLinks = links => {
             browserItem = {
               ...browserItem,
               path,
-              sortKeys: {
-              },
+              sortKeys: {},
               type: "group"
             };
           } else {
@@ -66,6 +63,7 @@ export const browserItemsFromLinks = links => {
               ...browserItem,
               label: `/${prevPart}`,
               path,
+              error: link.status === "MISSING",
               sortKeys: {
                 parentPage: filepathParts[2].slice(1, 6),
                 page: Number(filepathParts[2].slice(7, 12)),

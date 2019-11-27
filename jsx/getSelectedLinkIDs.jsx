@@ -10,7 +10,7 @@ function getSelectedLinkIDs() {
     if (item instanceof Rectangle) {
       var pageItem = item.allPageItems[0];
 
-      if (pageItem.itemLink) {
+      if (pageItem.hasOwnProperty("itemLink") && pageItem.itemLink) {
         selectedLinks.push(pageItem.itemLink.id);
       }
     }
