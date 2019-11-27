@@ -87,5 +87,5 @@ export const browserItemsFromLinks = links => {
     links
   );
 
-  return [...browserItems.values()];
+  return R.zipObj([...browserItems.keys()], [...browserItems.values()]);
 };

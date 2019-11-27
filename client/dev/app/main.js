@@ -7,22 +7,18 @@ import CSInterface from "../vendor/CSInterface"; // I had to manually add export
 import { runJSX } from "./helpers/jsx";
 import { dispatchEvent } from "./helpers/dispatchEvent";
 import { createCEPEventSubscription } from "./helpers/cepEventSubscription";
-import { asyncSubscriptionHandler } from "./helpers/asyncSubscriptionHandler";
-import { browserItemsFromLinks } from "./helpers/browserItemsFromLinks";
+// import { asyncSubscriptionHandler } from "./helpers/asyncSubscriptionHandler";
+// import { browserItemsFromLinks } from "./helpers/browserItemsFromLinks";
 
 const csInterface = new CSInterface();
 
-const dispatchEventWithCSInterface = (type, data) =>
-  dispatchEvent(csInterface, type, data);
-
-const createCEPEventSubscriptionWithCSInterface = type =>
-  createCEPEventSubscription(csInterface, type);
-
-const onSelectionChanged = createCEPEventSubscriptionWithCSInterface(
+const onSelectionChanged = createCEPEventSubscription(
+  csInterface,
   "afterSelectionChanged"
 );
 
-const onDocumentActivate = createCEPEventSubscriptionWithCSInterface(
+const onDocumentActivate = createCEPEventSubscription(
+  csInterface,
   "documentAfterActivate"
 );
 
@@ -34,21 +30,25 @@ const access = promisify(fs.access);
 
 import { BrowserItem } from "./components/BrowserItem";
 
-import { SetLinksAndBrowserItems } from "./actions/SetLinksAndBrowserItems";
+import { SetSelectedLinkIDs } from "./actions/SetSelectedLinkIDs";
 import { SetActiveDocument } from "./actions/SetActiveDocument";
 import { JSX } from "./effects/JSX";
 
 const getByID = (id, links) => R.find(R.propEq("id", id), links);
 
-const main = app({
+
+import { InitPanelData } from "./actions/InitPanelData";
+
+app({
   init: [
     {
       hostEventListeners: {},
       activeDocument: "",
-      links: []
+      links: [],
+      selectedLinkIDs: []
     },
     JSX({
-      action: SetLinksAndBrowserItems,
+      action: InitPanelData,
       filename: "getLinks.jsx"
     })
   ],
@@ -69,55 +69,31 @@ const main = app({
         }
 
         return <BrowserItem item={browserItem} error={!exists}></BrowserItem>;
-      }, R.sortWith([R.ascend(R.prop("key"))])(state.browserItems || []))}
+      }, R.sortWith([R.ascend(R.prop("key"))])(R.values(state.browserItems) || []))}
     </main>
   ),
 
   subscriptions: state => [
-    // onSelectionChanged(
-    //   asyncSubscriptionHandler(async dispatch => {
-    //     console.log("change selection");
-    //   const document = await new Promise((resolve, reject) =>
-    //     runJSX("getActiveDoc.jsx", resolve)
-    //   );
-    //   console.log(document)
-
-    //   if (state.document !== document) {
-    //     // changed document
-    //     dispatch(SetActiveDocument, document);
-
-    //     runJSX("getLinks.jsx", res =>
-    //       dispatchEventWithCSInterface("com.linkmanager2.updatedLinks", res)
-    //     );
-    //   } else {
-    //     // changed selection within same doc
-    //   }
-    //   })
-    // ),
-
-    onDocumentActivate((state, data) => {
-      const regexURL = /<url>(file:)(.+)<\/url>/;
-      const urlRaw = (regexURL.exec(data) || [])[2];
-      const url = decodeURI(urlRaw || "");
-
-      const regexName = /<name>(.+)<\/name>/;
-      const name = regexName.exec(data)[1];
-
-      return SetActiveDocument(state, `${url}:${name}`);
-    }),
-
-    onDocumentActivate([
+    onSelectionChanged([
       state,
       JSX({
-        action: SetLinksAndBrowserItems,
+        action: SetSelectedLinkIDs,
+        filename: "getSelectedLinkIDs.jsx"
+      })
+    ]),
+
+    onDocumentActivate((state, data) => [
+      SetActiveDocument(state, data),
+      JSX({
+        action: InitPanelData,
         filename: "getLinks.jsx"
+      }),
+      JSX({
+        action: SetSelectedLinkIDs,
+        filename: "getSelectedLinkIDs.jsx"
       })
     ])
   ],
 
   node: document.querySelector("#app")
 });
-
-runJSX("getLinks.jsx", res =>
-  dispatchEventWithCSInterface("com.linkmanager2.updatedLinks", res)
-);
