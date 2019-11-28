@@ -86,6 +86,7 @@ app({
             isCollapsed={browserItem.isCollapsed || isCollapsed}
             isError={browserItem.isError}
             isSelected={isSelected}
+        ControlPanelLabel={() => <span>{browserItem.pageNumber}</span>}
           ></BrowserItem>
         );
       }, R.sortWith([R.ascend(R.prop("key"))])(R.values(state.browserItems) || []))}

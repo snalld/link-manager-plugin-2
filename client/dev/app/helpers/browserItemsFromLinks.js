@@ -64,6 +64,7 @@ export const browserItemsFromLinks = links => {
               label: `${prevPart}`,
               path,
               isError: link.status === "MISSING",
+              pageNumber: Number(filepathParts[2].slice(7, 12)),
               sortKeys: {
                 parentPage: filepathParts[2].slice(1, 6),
                 page: Number(filepathParts[2].slice(7, 12)),

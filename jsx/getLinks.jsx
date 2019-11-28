@@ -26,7 +26,7 @@ function getLinks() {
       })(srcLink.status)
     };
 
-    if (parent.imageTypeName.indexOf("PDF") > -1) {
+    if (parent.hasOwnProperty("pdfAttributes")) {
       link["page"] = parent.pdfAttributes.pageNumber;
     }
 
