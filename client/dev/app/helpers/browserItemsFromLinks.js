@@ -25,17 +25,17 @@ export const browserItemsFromLinks = links => {
 
         const key = `${prevKey || ""}/${part}`;
 
-        let ids = [];
+        let linkIDs = [];
         if (items.has(key)) {
-          ids = items.get(key).ids;
+          linkIDs = items.get(key).linkIDs;
         }
 
         let browserItem = {
           key,
-          ids: [...ids, link.id],
+          linkIDs: [...linkIDs, link.id],
           indent: idx,
-          label: `/${part}`,
-          error: false
+          label: `${part}`,
+          isError: false
         };
 
         const r = /(.+\.[a-zA-Z]{2,4})(\/[a-zA-Z0-9]{5}-\d{5}-\d{5})?/;
@@ -61,9 +61,9 @@ export const browserItemsFromLinks = links => {
           } else {
             browserItem = {
               ...browserItem,
-              label: `/${prevPart}`,
+              label: `${prevPart}`,
               path,
-              error: link.status === "MISSING",
+              isError: link.status === "MISSING",
               sortKeys: {
                 parentPage: filepathParts[2].slice(1, 6),
                 page: Number(filepathParts[2].slice(7, 12)),

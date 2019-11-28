@@ -16,7 +16,7 @@ export const SetLinks = (state, links) => ({
 });
 
 export const SetBrowserItemError = (state, isError, id) => {
-  const newState = R.set(browserItemPropLens("error", id), isError, state);
+  const newState = R.set(browserItemPropLens("isError", id), isError, state);
   return newState;
 };
 

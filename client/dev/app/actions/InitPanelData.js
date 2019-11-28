@@ -14,8 +14,8 @@ export const InitPanelData = (state, links) => [
       const effects = R.compose(
         R.map(browserItem =>
           Exists({
-            action: (state, isError) =>
-              SetBrowserItemError(state, isError, browserItem.key),
+            action: (state, doesExist) =>
+              SetBrowserItemError(state, !doesExist, browserItem.key),
             path: `/Volumes/${browserItem.path}`
           })
         ),
