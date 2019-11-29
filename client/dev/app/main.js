@@ -4,8 +4,6 @@ import { app, h } from "hyperapp";
 
 import CSInterface from "../vendor/CSInterface"; // I had to manually add export line to vendor file :(
 
-import { runJSX } from "./helpers/jsx";
-import { dispatchEvent } from "./helpers/dispatchEvent";
 import { createCEPEventSubscription } from "./helpers/cepEventSubscription";
 import { walkParentTreeUntil } from "./helpers/browser/walkParentTreeUntil";
 
@@ -25,7 +23,7 @@ const __ = state => state;
 import { InitPanelData } from "./actions/InitPanelData";
 import { SetSelectedLinkIDs } from "./actions/SetSelectedLinkIDs";
 import { SetActiveDocument } from "./actions/SetActiveDocument";
-import { JSX } from "./effects/jsx";
+import { JSX } from "./effects/JSX";
 
 import { BrowserItem } from "./components/BrowserItem";
 
@@ -40,16 +38,25 @@ app({
       selectedLinkIDs: []
     },
     JSX({
-      action: InitPanelData,
-      filename: "getLinks.jsx"
-    }),
-    JSX({
       action: SetActiveDocument,
       filename: "getActiveDocument.jsx"
     }),
     JSX({
+      action: (state, activeDocument) =>
+        activeDocument.url === state.activeDocument.url
+          ? [
+              state,
+              JSX({
+                action: InitPanelData,
+                filename: "getLinks.jsx"
+              })
+            ]
+          : state,
+      filename: "getActiveDocument.jsx"
+    }),
+    JSX({
       action: SetSelectedLinkIDs,
-      filename: "getSelectedLInkIDs.jsx"
+      filename: "getSelectedLinkIDs.jsx"
     })
   ],
 
@@ -65,6 +72,8 @@ app({
           R.contains(browserItem.linkIDs[0], state.selectedLinkIDs);
         let isCollapsed = false;
 
+        let effectivePPI
+
         const isSingleGroup =
           browserItem.type === "group" && browserItem.linkIDs.length === 1;
         if (isSingleGroup) collapsible = false;
@@ -79,6 +88,11 @@ app({
             );
         if (isOnlyFileInGroup) isCollapsed = true;
 
+        if (browserItem.type === "file" || isSingleGroup) {
+          collapsible = false
+          // console.log(Object.keys(getByID(browserItem.linkIDs[0], state.links) || {}))
+        }
+
         return (
           <BrowserItem
             item={browserItem}
@@ -86,7 +100,12 @@ app({
             isCollapsed={browserItem.isCollapsed || isCollapsed}
             isError={browserItem.isError}
             isSelected={isSelected}
-        ControlPanelLabel={() => <span>{browserItem.pageNumber}</span>}
+            Columns={[
+              <span>{browserItem.label}</span>,
+              <span>{browserItem.pageNumber}</span>,
+              <span>{browserItem.parentPageNumber}</span>,
+              <span>{effectivePPI}</span>,
+            ]}
           ></BrowserItem>
         );
       }, R.sortWith([R.ascend(R.prop("key"))])(R.values(state.browserItems) || []))}
@@ -97,20 +116,51 @@ app({
     onSelectionChanged([
       state,
       JSX({
-        action: SetSelectedLinkIDs,
-        filename: "getSelectedLinkIDs.jsx"
+        action: (state, activeDocument) =>
+          activeDocument.url === state.activeDocument.url
+            ? [
+                state,
+                JSX({
+                  action: SetSelectedLinkIDs,
+                  filename: "getSelectedLinkIDs.jsx"
+                })
+              ]
+            : state,
+        filename: "getActiveDocument.jsx"
       })
     ]),
 
-    onDocumentActivate((state, data) => [
-      SetActiveDocument(state, data),
+    onDocumentActivate(state => [
+      state,
       JSX({
-        action: InitPanelData,
-        filename: "getLinks.jsx"
+        action: SetActiveDocument,
+        filename: "getActiveDocument.jsx"
       }),
       JSX({
-        action: SetSelectedLinkIDs,
-        filename: "getSelectedLinkIDs.jsx"
+        action: (state, activeDocument) =>
+          activeDocument.url === state.activeDocument.url
+            ? [
+                state,
+                JSX({
+                  action: InitPanelData,
+                  filename: "getLinks.jsx"
+                })
+              ]
+            : state,
+        filename: "getActiveDocument.jsx"
+      }),
+      JSX({
+        action: (state, activeDocument) =>
+          activeDocument.url === state.activeDocument.url
+            ? [
+                state,
+                JSX({
+                  action: SetSelectedLinkIDs,
+                  filename: "getSelectedLinkIDs.jsx"
+                })
+              ]
+            : state,
+        filename: "getActiveDocument.jsx"
       })
     ])
   ],

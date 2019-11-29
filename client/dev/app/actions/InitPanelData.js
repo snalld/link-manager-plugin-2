@@ -2,30 +2,21 @@ import * as R from "ramda";
 
 import { SetLinksAndBrowserItems } from "./SetLinksAndBrowserItems";
 import { SetBrowserItemError } from "./SetLinksAndBrowserItems";
-import { Exists } from "../effects/fs";
-import { JSX } from "../effects/jsx";
+import { Exists } from "../effects/FS";
 
-export const InitPanelData = (state, links) => [
-  state,
-  JSX({
-    action: (state, document) => {
-      const newState = SetLinksAndBrowserItems(state, links);
+export const InitPanelData = (state, links) => {
+  const newState = SetLinksAndBrowserItems(state, links);
 
-      const effects = R.compose(
-        R.map(browserItem =>
-          Exists({
-            action: (state, doesExist) =>
-              SetBrowserItemError(state, !doesExist, browserItem.key),
-            path: `/Volumes/${browserItem.path}`
-          })
-        ),
-        R.values
-      )(newState.browserItems);
+  const effects = R.compose(
+    R.map(browserItem =>
+      Exists({
+        action: (state, doesExist) =>
+          SetBrowserItemError(state, !doesExist, browserItem.key),
+        path: `/Volumes/${browserItem.path}`
+      })
+    ),
+    R.values
+  )(newState.browserItems);
 
-      return document.url === state.activeDocument.url
-        ? [newState, ...effects]
-        : state;
-    },
-    filename: "getActiveDocument.jsx"
-  })
-];
+  return [newState, ...effects];
+};

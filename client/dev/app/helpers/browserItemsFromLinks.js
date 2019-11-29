@@ -59,17 +59,25 @@ export const browserItemsFromLinks = links => {
               type: "group"
             };
           } else {
+            const pageNumber = filepathParts[2].slice(7, 12)
+            const parentPageNumber = filepathParts[2].slice(1, 6)
+            const id = filepathParts[2].slice(13)
+
             browserItem = {
               ...browserItem,
               label: `${prevPart}`,
               path,
               isError: link.status === "MISSING",
-              pageNumber: Number(filepathParts[2].slice(7, 12)),
-              sortKeys: {
-                parentPage: filepathParts[2].slice(1, 6),
-                page: Number(filepathParts[2].slice(7, 12)),
-                id: Number(filepathParts[2].slice(13))
-              },
+              isWarn: link.status === "UPDATED",
+              pageNumber: link.page,
+              parentPageNumber: link.parentPage,
+              id: link.id,
+              effectivePPI: link.effectivePPI,
+              // sortKeys: {
+              //   parentPage: filepathParts[2].slice(1, 6),
+              //   page: Number(filepathParts[2].slice(7, 12)),
+              //   id: Number(filepathParts[2].slice(13))
+              // },
               type: "file"
             };
           }

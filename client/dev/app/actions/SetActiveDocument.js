@@ -10,7 +10,7 @@ export const SetActiveDocument = (state, activeDocument) => {
 
     activeDocument = {
       name,
-      path
+      path,
     };
   }
 
