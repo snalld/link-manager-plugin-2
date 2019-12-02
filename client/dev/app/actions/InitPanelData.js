@@ -11,7 +11,10 @@ export const InitPanelData = (state, links) => {
     R.map(browserItem =>
       Exists({
         action: (state, doesExist) =>
-          SetBrowserItemError(state, !doesExist, browserItem.key),
+          SetBrowserItemError(state, {
+            value: !doesExist,
+            id: browserItem.key
+          }),
         path: `/Volumes/${browserItem.path}`
       })
     ),

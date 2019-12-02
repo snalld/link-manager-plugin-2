@@ -15,8 +15,14 @@ export const SetLinks = (state, links) => ({
   links
 });
 
-export const SetBrowserItemError = (state, isError, id) => {
-  const newState = R.set(browserItemPropLens("isError", id), isError, state);
+export const SetBrowserItemError = (state, {id, value}) => {
+  const newState = R.set(browserItemPropLens("isError", id), value, state);
+  return newState;
+};
+
+export const SetBrowserItemCollapsed = (state, {id, value}) => {
+  console.log(id, value)
+  const newState = R.set(browserItemPropLens("isCollapsed", id), value, state);
   return newState;
 };
 

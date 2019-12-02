@@ -23,6 +23,7 @@ const __ = state => state;
 import { InitPanelData } from "./actions/InitPanelData";
 import { SetSelectedLinkIDs } from "./actions/SetSelectedLinkIDs";
 import { SetActiveDocument } from "./actions/SetActiveDocument";
+import { SetBrowserItemCollapsed } from "./actions/SetLinksAndBrowserItems";
 import { JSX } from "./effects/JSX";
 
 import { BrowserItem } from "./components/BrowserItem";
@@ -65,18 +66,20 @@ app({
       {console.log(state)}
 
       {R.addIndex(R.map)((browserItem, idx, src) => {
+        let indent = 0;
         let collapsible = true;
 
+        let isCollapsed = false;
+        let isHidden = false;
         let isSelected =
           browserItem.linkIDs.length === 1 &&
           R.contains(browserItem.linkIDs[0], state.selectedLinkIDs);
-        let isCollapsed = false;
 
         let effectivePPI
 
         const isSingleGroup =
           browserItem.type === "group" && browserItem.linkIDs.length === 1;
-        if (isSingleGroup) collapsible = false;
+        if (isSingleGroup) isHidden = true
 
         const isOnlyFileInGroup =
           browserItem.type === "file" &&
@@ -86,7 +89,7 @@ app({
               idx,
               src
             );
-        if (isOnlyFileInGroup) isCollapsed = true;
+        if (isOnlyFileInGroup) indent = browserItem.indent - 1;
 
         if (browserItem.type === "file" || isSingleGroup) {
           collapsible = false
@@ -96,8 +99,10 @@ app({
         return (
           <BrowserItem
             item={browserItem}
+            indent={indent || browserItem.indent}
             collapsible={collapsible}
             isCollapsed={browserItem.isCollapsed || isCollapsed}
+            isHidden={browserItem.isHidden || isHidden || !!walkParentTreeUntil(parent => !parent || parent.isCollapsed === true, idx, src)}
             isError={browserItem.isError}
             isSelected={isSelected}
             Columns={[
@@ -106,6 +111,7 @@ app({
               <span>{browserItem.parentPageNumber}</span>,
               <span>{effectivePPI}</span>,
             ]}
+            // setCollapsed={isCollapsed => SetBrowserItemCollapsed(state, browserItem.key, isCollapsed)}
           ></BrowserItem>
         );
       }, R.sortWith([R.ascend(R.prop("key"))])(R.values(state.browserItems) || []))}
