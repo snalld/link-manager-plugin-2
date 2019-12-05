@@ -36,18 +36,37 @@ import { JSX } from "./effects/JSX";
 import { BrowserItem } from "./components/BrowserItem";
 import { runJSX } from "./helpers/jsx";
 import { If } from "./components/Logic";
+import { pipeActions } from "./helpers/pipeActions";
 
 // runJSX("getPDFInfo.jsx", res => console.log(res))
 
 const getByID = (id, object) => R.find(R.propEq("id", id), object);
 const getByProp = (prop, id, object) => R.find(R.propEq(prop, id), object);
 
-const pipeActions = (state, actions) =>
-  R.reduce(
-    (nextState, { action, args }) => action(nextState, args),
-    state,
-    actions
-  );
+const ChangeBrowserItemPageNumber = (newPageNumber, browserItem, state) => [
+  state,
+  JSX({
+    action: (state, { id, pageNumber }) =>
+      pipeActions(state, [
+        {
+          action: SetBrowserItemPageNumber,
+          args: {
+            id: browserItem.key,
+            value: pageNumber
+          }
+        },
+        {
+          action: ReplaceBrowserItemLinkID,
+          args: {
+            from: browserItem.linkIDs[0],
+            to: id
+          }
+        }
+      ]),
+    filename: "changePlacedLinkPage.jsx",
+    args: [newPageNumber, browserItem.linkIDs[0]]
+  })
+];
 
 app({
   init: [
@@ -148,64 +167,20 @@ app({
               <span>
                 <If condition={browserItem.pageNumber}>
                   <span
-                    onClick={[
-                      state,
-                      JSX({
-                        action: (state, { id, pageNumber }) =>
-                          pipeActions(state, [
-                            {
-                              action: SetBrowserItemPageNumber,
-                              args: {
-                                id: browserItem.key,
-                                value: pageNumber
-                              }
-                            },
-                            {
-                              action: ReplaceBrowserItemLinkID,
-                              args: {
-                                from: browserItem.linkIDs[0],
-                                to: id
-                              }
-                            }
-                          ]),
-                        filename: "changePlacedLinkPage.jsx",
-                        args: [
-                          browserItem.pageNumber - 1,
-                          browserItem.linkIDs[0]
-                        ]
-                      })
-                    ]}
+                    onClick={ChangeBrowserItemPageNumber(
+                      browserItem.pageNumber - 1,
+                      browserItem,
+                      state
+                    )}
                   >
                     -
                   </span>
                   <span
-                    onClick={[
-                      state,
-                      JSX({
-                        action: (state, { id, pageNumber }) =>
-                          pipeActions(state, [
-                            {
-                              action: SetBrowserItemPageNumber,
-                              args: {
-                                id: browserItem.key,
-                                value: pageNumber
-                              }
-                            },
-                            {
-                              action: ReplaceBrowserItemLinkID,
-                              args: {
-                                from: browserItem.linkIDs[0],
-                                to: id
-                              }
-                            }
-                          ]),
-                        filename: "changePlacedLinkPage.jsx",
-                        args: [
-                          browserItem.pageNumber + 1,
-                          browserItem.linkIDs[0]
-                        ]
-                      })
-                    ]}
+                    onClick={ChangeBrowserItemPageNumber(
+                      browserItem.pageNumber + 1,
+                      browserItem,
+                      state
+                    )}
                   >
                     +
                   </span>

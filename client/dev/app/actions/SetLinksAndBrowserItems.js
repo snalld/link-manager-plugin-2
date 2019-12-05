@@ -24,11 +24,12 @@ const lensAllInstancesOfID = id =>
     L.prop("browserItems"),
     L.values,
     L.prop("linkIDs"),
-    L.find(R.equals(id))
+    L.find(R.equals(id)),
+    L.optional
   );
 
 export const ReplaceBrowserItemLinkID = (state, { from, to }) =>
-  L.set(lensAllInstancesOfID(from), to, state);
+  L.modify(lensAllInstancesOfID(from), (from) => {console.log("from to",from, to); return to}, state);
 
 export const SetBrowserItemPageNumber = (state, { id, value }) =>
   L.set(["browserItems", id, "pageNumber"], value, state);
