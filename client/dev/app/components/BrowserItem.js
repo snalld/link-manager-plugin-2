@@ -42,7 +42,7 @@ export const BrowserItem = ({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "16px auto 1fr 16px 16px",
+          gridTemplateColumns: "16px auto 1fr 32px 16px",
           gridTemplateRows: "16px",
           justifyItems: "start",
           color: isError ? "red" : "black"

@@ -1,0 +1,17 @@
+@font-face {
+    font-family: 'FiraMono';
+    src: url('../fonts/Fira Mono/FiraMono-Regular.ttf')  format('truetype');
+    font-weight: 400;
+}
+
+/* @font-face {
+    font-family: 'FiraMono';
+    src: url('../fonts/Fira Mono/FiraMono-Light.ttf')  format('truetype');
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'FiraMono';
+    src: url('../fonts/Fira Mono/FiraMono-Thin.ttf')  format('truetype');
+    font-weight: 200;
+} */

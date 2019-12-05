@@ -21,8 +21,34 @@ export const SetBrowserItemError = (state, {id, value}) => {
 };
 
 export const SetBrowserItemCollapsed = (state, {id, value}) => {
-  console.log(id, value)
   const newState = R.set(browserItemPropLens("isCollapsed", id), value, state);
+  return newState;
+};
+
+import * as L from "partial.lenses";
+
+const allInstancesOfID = (id) => L.compose(
+  L.prop("browserItems"),
+  L.values,
+  L.prop('linkIDs'),
+  L.find(R.equals(id)),
+)
+
+export const ReplaceBrowserItemLinkID = (state, {from, to}) => {
+
+  const newState = L.modify(
+    allInstancesOfID(from),
+    () => to,
+    state
+  )
+
+  console.log("lens", newState)
+
+  return newState
+}
+
+export const SetBrowserItemPageNumber = (state, {id, value}) => {
+  const newState = R.set(browserItemPropLens("pageNumber", id), value, state);
   return newState;
 };
 

@@ -1,4 +1,4 @@
-const fs = eval('require("fs")');
+const fs = require("fs");
 import { promisify } from "util";
 const access = promisify(fs.access);
 

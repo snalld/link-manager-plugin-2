@@ -1,0 +1,13 @@
+:root {
+  --black: rgb(50, 50, 50);
+  --grey-darkest: #383838;
+  --grey-darker: #454545;
+  --grey-dark: rgb(83, 83, 83);
+  --grey: #737373;
+  --grey-light: #c3c3c3;
+  --grey-lighter: #d1d1d1;
+  --grey-lightest: #f0f0f0;
+  --white: #ffffff;
+
+  --blue: #4ba2f2;
+}

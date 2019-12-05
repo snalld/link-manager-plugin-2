@@ -4,9 +4,14 @@
   "license": "MIT",
   "dependencies": {
     "classcat": "^4.0.2",
+    "fonts.css": "^2.0.0",
     "fs-extra": "^8.1.0",
     "hyperapp": "^2.0.3",
-    "ramda": "^0.26.1"
+    "partial.lenses": "^14.17.0",
+    "pdf-parse": "^1.1.1",
+    "pdf2json": "^1.1.8",
+    "ramda": "^0.26.1",
+    "test": "^0.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
@@ -14,11 +19,10 @@
     "@babel/preset-env": "^7.6.3",
     "chokidar-cli": "^2.0.0",
     "concurrently": "^5.0.0",
-    "parcel-bundler": "^1.12.4",
-    "parcel-plugin-externals": "^0.2.0"
+    "parcel-bundler": "^1.12.4"
   },
   "scripts": {
-    "dev": "npx parcel watch dev/index.html --public-url ./ --hmr-hostname localhost"
+    "dev": "npx parcel watch dev/index.html --public-url ./ --hmr-hostname localhost --target node --bundle-node-modules"
   },
   "browserslist": [
     "last 1 Chrome version"

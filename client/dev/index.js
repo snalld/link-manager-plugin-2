@@ -1,1 +1,0 @@
-const panel = require(`${__dirname}/app/main.js`)
