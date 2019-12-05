@@ -19,18 +19,11 @@ const onDocumentActivate = createCEPEventSubscription(
   "documentAfterActivate"
 );
 
-const Log = (state, data) => {
-  console.log(data);
-  return state;
-};
-
-const __ = state => state;
-
 import { InitPanelData } from "./actions/InitPanelData";
 import { SetSelectedLinkIDs } from "./actions/SetSelectedLinkIDs";
 import { SetActiveDocument } from "./actions/SetActiveDocument";
 import { SetBrowserItemPageNumber } from "./actions/SetLinksAndBrowserItems";
-import { ReplaceBrowserItemLinkID } from "./actions/SetLinksAndBrowserItems";
+import { ReplaceLinkIDForAllBrowserItem } from "./actions/SetLinksAndBrowserItems";
 import { JSX } from "./effects/JSX";
 
 import { BrowserItem } from "./components/BrowserItem";
@@ -50,17 +43,11 @@ const ChangeBrowserItemPageNumber = (newPageNumber, browserItem, state) => [
       pipeActions(state, [
         {
           action: SetBrowserItemPageNumber,
-          args: {
-            id: browserItem.key,
-            value: pageNumber
-          }
+          args: { id: browserItem.key, value: pageNumber }
         },
         {
-          action: ReplaceBrowserItemLinkID,
-          args: {
-            from: browserItem.linkIDs[0],
-            to: id
-          }
+          action: ReplaceLinkIDForAllBrowserItem,
+          args: { from: browserItem.linkIDs[0], to: id }
         }
       ]),
     filename: "changePlacedLinkPage.jsx",
@@ -190,7 +177,6 @@ app({
               <span>{browserItem.parentPageNumber}</span>,
               <span>{effectivePPI}</span>
             ]}
-            // setCollapsed={isCollapsed => SetBrowserItemCollapsed(state, browserItem.key, isCollapsed)}
           ></BrowserItem>
         );
       }, R.sortWith([R.ascend(R.prop("key"))])(R.values(state.browserItems) || []))}

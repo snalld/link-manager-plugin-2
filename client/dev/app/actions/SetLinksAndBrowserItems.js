@@ -19,6 +19,15 @@ export const SetBrowserItemError = (state, { id, value }) =>
 export const SetBrowserItemCollapsed = (state, { id, value }) =>
   L.set(["browserItems", id, "isCollapsed"], value, state);
 
+export const SetBrowserItemPageNumber = (state, { id, value }) =>
+  L.set(["browserItems", id, "pageNumber"], value, state);
+
+export const SetLinksAndBrowserItems = (state, links) => {
+  const browserItems = browserItemsFromLinks(links);
+  return SetBrowserItems(SetLinks(state, links), browserItems);
+};
+
+
 const lensAllInstancesOfID = id =>
   L.compose(
     L.prop("browserItems"),
@@ -28,13 +37,5 @@ const lensAllInstancesOfID = id =>
     L.optional
   );
 
-export const ReplaceBrowserItemLinkID = (state, { from, to }) =>
+export const ReplaceLinkIDForAllBrowserItem = (state, { from, to }) =>
   L.modify(lensAllInstancesOfID(from), (from) => {console.log("from to",from, to); return to}, state);
-
-export const SetBrowserItemPageNumber = (state, { id, value }) =>
-  L.set(["browserItems", id, "pageNumber"], value, state);
-
-export const SetLinksAndBrowserItems = (state, links) => {
-  const browserItems = browserItemsFromLinks(links);
-  return SetBrowserItems(SetLinks(state, links), browserItems);
-};
