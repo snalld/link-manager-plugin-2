@@ -42,9 +42,9 @@ export const BrowserItem = ({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "16px auto 1fr 32px 16px",
+          gridTemplateColumns: "16px auto 1fr 48px 16px",
           gridTemplateRows: "16px",
-          justifyItems: "start",
+          justifyItems: "stretch",
           color: isError ? "red" : "black"
         }}
       >
@@ -59,7 +59,7 @@ export const BrowserItem = ({
             <div
               style={{
                 overflow: "hidden",
-                justifySelf: "start"
+                // justifySelf: "start"
               }}
             >
               {column}
@@ -69,7 +69,7 @@ export const BrowserItem = ({
         )}
         {R.map(
           column => (
-            <div style={{ overflow: "hidden" }}>{column}</div>
+            <div style={{ display: "flex", backgroundColor: "lightblue"}}>{column}</div>
           ),
           R.tail(Columns)
         )}

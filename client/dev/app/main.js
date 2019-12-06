@@ -36,7 +36,7 @@ import { pipeActions } from "./helpers/pipeActions";
 const getByID = (id, object) => R.find(R.propEq("id", id), object);
 const getByProp = (prop, id, object) => R.find(R.propEq(prop, id), object);
 
-const ChangeBrowserItemPageNumber = (newPageNumber, browserItem, state) => [
+const ChangeBrowserItemPageNumber = (state, { pageNumber, browserItem }) => [
   state,
   JSX({
     action: (state, { id, pageNumber }) =>
@@ -51,7 +51,7 @@ const ChangeBrowserItemPageNumber = (newPageNumber, browserItem, state) => [
         }
       ]),
     filename: "changePlacedLinkPage.jsx",
-    args: [newPageNumber, browserItem.linkIDs[0]]
+    args: [pageNumber, browserItem.linkIDs[0]]
   })
 ];
 
@@ -150,32 +150,47 @@ app({
             isError={browserItem.isError}
             isSelected={isSelected}
             Columns={[
-              <span>{browserItem.label}</span>,
-              <span>
-                <If condition={browserItem.pageNumber}>
-                  <span
-                    onClick={ChangeBrowserItemPageNumber(
-                      browserItem.pageNumber - 1,
-                      browserItem,
-                      state
-                    )}
+              <div>{browserItem.label}</div>,
+              <If condition={browserItem.pageNumber}>
+                <div
+                  style={{
+                    display: "block",
+                    display: "flex",
+                    flexDirection: "column",
+                    position: "relative",
+                    width: 12,
+                    height: 16
+                  }}
+                >
+                  <div
+                    style={{ height: 8, textAlign: "center" }}
+                    onClick={[
+                      ChangeBrowserItemPageNumber,
+                      {
+                        pageNumber: browserItem.pageNumber + 1,
+                        browserItem: browserItem
+                      }
+                    ]}
                   >
-                    -
-                  </span>
-                  <span
-                    onClick={ChangeBrowserItemPageNumber(
-                      browserItem.pageNumber + 1,
-                      browserItem,
-                      state
-                    )}
+                    <div style={{ marginTop: -4.5 }}>∧</div>
+                  </div>
+                  <div
+                    style={{ height: 8, textAlign: "center" }}
+                    onClick={[
+                      ChangeBrowserItemPageNumber,
+                      {
+                        pageNumber: browserItem.pageNumber - 1,
+                        browserItem: browserItem
+                      }
+                    ]}
                   >
-                    +
-                  </span>
-                  <span>{browserItem.pageNumber}</span>
-                </If>
-              </span>,
-              <span>{browserItem.parentPageNumber}</span>,
-              <span>{effectivePPI}</span>
+                    <div style={{ marginTop: -5 }}>∨</div>
+                  </div>
+                </div>
+                <div style={{ display: "block" }}>{browserItem.pageNumber}</div>
+              </If>,
+              <div>{browserItem.parentPageNumber}</div>,
+              <div>{effectivePPI}</div>
             ]}
           ></BrowserItem>
         );
