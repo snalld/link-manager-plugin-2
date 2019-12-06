@@ -30,6 +30,7 @@ import { BrowserItem } from "./components/BrowserItem";
 import { runJSX } from "./helpers/jsx";
 import { If } from "./components/Logic";
 import { pipeActions } from "./helpers/pipeActions";
+import { IncDecArrows } from "./components/IncDecArrows";
 
 // runJSX("getPDFInfo.jsx", res => console.log(res))
 
@@ -152,41 +153,22 @@ app({
             Columns={[
               <div>{browserItem.label}</div>,
               <If condition={browserItem.pageNumber}>
-                <div
-                  style={{
-                    display: "block",
-                    display: "flex",
-                    flexDirection: "column",
-                    position: "relative",
-                    width: 12,
-                    height: 16
-                  }}
-                >
-                  <div
-                    style={{ height: 8, textAlign: "center" }}
-                    onClick={[
-                      ChangeBrowserItemPageNumber,
-                      {
-                        pageNumber: browserItem.pageNumber + 1,
-                        browserItem: browserItem
-                      }
-                    ]}
-                  >
-                    <div style={{ marginTop: -4.5 }}>∧</div>
-                  </div>
-                  <div
-                    style={{ height: 8, textAlign: "center" }}
-                    onClick={[
-                      ChangeBrowserItemPageNumber,
-                      {
-                        pageNumber: browserItem.pageNumber - 1,
-                        browserItem: browserItem
-                      }
-                    ]}
-                  >
-                    <div style={{ marginTop: -5 }}>∨</div>
-                  </div>
-                </div>
+                <IncDecArrows
+                  Increment={[
+                    ChangeBrowserItemPageNumber,
+                    {
+                      pageNumber: browserItem.pageNumber + 1,
+                      browserItem: browserItem
+                    }
+                  ]}
+                  Decrement={[
+                    ChangeBrowserItemPageNumber,
+                    {
+                      pageNumber: browserItem.pageNumber - 1,
+                      browserItem: browserItem
+                    }
+                  ]}
+                ></IncDecArrows>
                 <div style={{ display: "block" }}>{browserItem.pageNumber}</div>
               </If>,
               <div>{browserItem.parentPageNumber}</div>,

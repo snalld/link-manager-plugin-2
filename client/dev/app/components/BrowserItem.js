@@ -1,26 +1,11 @@
-import * as R from "ramda";
 import { h } from "hyperapp";
+import * as R from "ramda";
 
 import { SetBrowserItemCollapsed } from "../actions/SetLinksAndBrowserItems";
 
 import { WidthSpacer } from "./WidthSpacer";
 
-const setValue = (value, [action, props]) => [
-  action,
-  { ...props, value }
-];
-
-const CollapseArrow = ({ isCollapsed, isHidden, OnClick }) => (
-  <div style={{ display: "flex" }}>
-    {!isHidden ? (
-      !isCollapsed ? (
-        <p style={{margin: 0}} onclick={setValue(true, OnClick)}>↓</p>
-      ) : (
-        <p style={{margin: 0}} onclick={setValue(false, OnClick)}>→</p>
-      )
-    ) : null}
-  </div>
-);
+import { CollapseArrow } from "./CollapseArrow";
 
 export const BrowserItem = ({
   item,
@@ -28,7 +13,7 @@ export const BrowserItem = ({
   collapsible,
   isCollapsed,
   isError,
-  isHidden, 
+  isHidden,
   isSelected,
   Columns = []
 }) =>
@@ -58,8 +43,7 @@ export const BrowserItem = ({
           column => (
             <div
               style={{
-                overflow: "hidden",
-                // justifySelf: "start"
+                overflow: "hidden"
               }}
             >
               {column}
@@ -69,7 +53,7 @@ export const BrowserItem = ({
         )}
         {R.map(
           column => (
-            <div style={{ display: "flex", backgroundColor: "lightblue"}}>{column}</div>
+            <div style={{ display: "flex" }}>{column}</div>
           ),
           R.tail(Columns)
         )}
