@@ -19,7 +19,7 @@ export const BrowserItem = ({
 }) =>
   !isHidden && (
     <div
-      key={item.key}
+      key={item.id}
       style={{
         backgroundColor: isSelected ? "lightgrey" : ""
       }}
@@ -36,7 +36,7 @@ export const BrowserItem = ({
         <CollapseArrow
           isHidden={!collapsible}
           isCollapsed={isCollapsed}
-          OnClick={[SetBrowserItemCollapsed, { id: item.key }]}
+          OnClick={[SetBrowserItemCollapsed, { id: item.id }]}
         />
         <WidthSpacer depth={indent} width={16} />
         {R.map(

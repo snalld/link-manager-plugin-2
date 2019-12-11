@@ -24,6 +24,7 @@ export const browserItemsFromLinks = links => {
         if (!part) part = 0;
 
         const key = `${prevKey || ""}/${part}`;
+        const id = `${link.documentID}/${key}`;
 
         let linkIDs = [];
         if (items.has(key)) {
@@ -31,7 +32,8 @@ export const browserItemsFromLinks = links => {
         }
 
         let browserItem = {
-          key,
+          documentID: link.documentID,
+          id,
           linkIDs: [...linkIDs, link.id],
           indent: idx,
           label: `${part}`,
@@ -55,14 +57,9 @@ export const browserItemsFromLinks = links => {
             browserItem = {
               ...browserItem,
               path,
-              sortKeys: {},
               type: "group"
             };
           } else {
-            const pageNumber = filepathParts[2].slice(7, 12)
-            const parentPageNumber = filepathParts[2].slice(1, 6)
-            const id = filepathParts[2].slice(13)
-
             browserItem = {
               ...browserItem,
               label: `${prevPart}`,
@@ -71,19 +68,13 @@ export const browserItemsFromLinks = links => {
               isWarn: link.status === "UPDATED",
               pageNumber: link.page,
               parentPageNumber: link.parentPage,
-              id: link.id,
               effectivePPI: link.effectivePPI,
-              // sortKeys: {
-              //   parentPage: filepathParts[2].slice(1, 6),
-              //   page: Number(filepathParts[2].slice(7, 12)),
-              //   id: Number(filepathParts[2].slice(13))
-              // },
               type: "file"
             };
           }
         }
 
-        items.set(key, browserItem);
+        items.set(id, browserItem);
 
         return [part, key];
       }, "")(keyParts);

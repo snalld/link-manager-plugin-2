@@ -13,7 +13,7 @@ export const InitPanelData = (state, links) => {
         action: (state, doesExist) =>
           SetBrowserItemError(state, {
             value: !doesExist,
-            id: browserItem.key
+            id: browserItem.id
           }),
         path: `/Volumes/${browserItem.path}`
       })

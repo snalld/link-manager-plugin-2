@@ -13,7 +13,7 @@ export const SetLinks = (state, links) => ({
   links
 });
 
-export const SetBrowserItemError = (state, { id, value }) =>
+export const SetBrowserItemError = (state, { id, value }) => 
   L.set(["browserItems", id, "isError"], value, state);
 
 export const SetBrowserItemCollapsed = (state, { id, value }) =>

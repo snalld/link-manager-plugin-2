@@ -1,5 +1,7 @@
 function getLinks() {
   var doc = app.activeDocument;
+  var docName = doc.name;
+  var docPath = Folder.decode(doc.filePath.path) + "/" +  docName;
 
   var list = [];
 
@@ -12,6 +14,7 @@ function getLinks() {
     // alert(parent.parent.parent.constructor)
     
     var link = {
+      documentID: docPath,
       path: srcLink.filePath,
       name: srcLink.name,
       id: srcLink.id,
